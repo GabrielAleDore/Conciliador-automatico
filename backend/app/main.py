@@ -31,10 +31,16 @@ app.add_middleware(
 
 IN_MEMORY_SESSIONS: Dict[str, ReconciliationResponse] = {}
 
-# Caminho para o build do frontend (gerado por `npm run build`)
-_FRONTEND_DIST = Path(__file__).parent.parent.parent / "frontend" / "dist"
+# Caminho para o build do frontend — suporta dev local e Docker/Railway
+_ROOT = Path(__file__).parent.parent.parent  # /app quando no Docker
+_CANDIDATES = [
+    _ROOT / "frontend" / "dist",           # Docker: /app/frontend/dist
+    Path("/app/frontend/dist"),             # Railway fallback absoluto
+    _ROOT.parent / "frontend" / "dist",    # dev local alternativo
+]
+_FRONTEND_DIST = next((p for p in _CANDIDATES if p.exists()), _CANDIDATES[0])
 
-# Em produção (Railway), serve os assets estáticos do React
+# Em produção, serve os assets estáticos do React
 if _FRONTEND_DIST.exists():
     app.mount("/assets", StaticFiles(directory=_FRONTEND_DIST / "assets"), name="assets")
 
