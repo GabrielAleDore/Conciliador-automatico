@@ -31,5 +31,8 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 # Expõe a porta (Railway injeta $PORT automaticamente)
 EXPOSE 8000
 
+# Working dir do runtime = pasta backend (para que `app.main` seja encontrado)
+WORKDIR /app/backend
+
 # Inicia o servidor
-CMD uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}

@@ -32,11 +32,12 @@ app.add_middleware(
 IN_MEMORY_SESSIONS: Dict[str, ReconciliationResponse] = {}
 
 # Caminho para o build do frontend — suporta dev local e Docker/Railway
-_ROOT = Path(__file__).parent.parent.parent  # /app quando no Docker
+# No Docker: __file__ = /app/backend/app/main.py → parent×3 = /app
+_ROOT = Path(__file__).resolve().parent.parent.parent
 _CANDIDATES = [
-    _ROOT / "frontend" / "dist",           # Docker: /app/frontend/dist
-    Path("/app/frontend/dist"),             # Railway fallback absoluto
-    _ROOT.parent / "frontend" / "dist",    # dev local alternativo
+    _ROOT / "frontend" / "dist",            # Docker: /app/frontend/dist ✓
+    Path("/app/frontend/dist"),              # fallback absoluto Railway
+    _ROOT.parent / "frontend" / "dist",     # dev local: Conciliador/frontend/dist
 ]
 _FRONTEND_DIST = next((p for p in _CANDIDATES if p.exists()), _CANDIDATES[0])
 
